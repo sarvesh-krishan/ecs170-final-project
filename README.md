@@ -1,1 +1,1 @@
-# ECS 171 Group 18 Final Project
+# ECS 170 Group 18 Final Project
