@@ -32,7 +32,7 @@ if 1:
     input_size = 100  # Size of the input vectors (e.g., GloVe word embeddings)
     hidden_size = 128  # Size of the hidden state in the RNN
     num_classes = 2  # Number of output classes (positive and negative)
-    num_epochs = 15
+    num_epochs = 10
 
     # Create an instance of the classifier
     rnn_classifier = RNNClassifier(input_size, hidden_size, num_classes)
