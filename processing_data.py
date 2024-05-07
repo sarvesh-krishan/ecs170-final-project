@@ -6,8 +6,8 @@ from torch.utils.data import Dataset
 from torch.nn.utils.rnn import pad_sequence
 
 
-
-glove_file = '../data/.vector_cache/glove.6B.100d.txt'
+current_dir = os.getcwd()
+glove_file = os.path.join(current_dir, 'data', '.vector_cache', 'glove.6B.100d.txt')
 glove = Vectors(glove_file)
 
 def collate_fn(batch):

@@ -15,7 +15,3 @@ def generate_histogram(*directories):
     plt.title('Movie Rating Frequency')
     plt.show()
 
-
-directory_path1 = os.path.join('data', 'test', 'neg')
-directory_path2 = os.path.join('data', 'test', 'pos')
-generate_histogram(directory_path1, directory_path2)
