@@ -1,4 +1,5 @@
 import torch
+import time
 from torch import nn
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from processing_data import glove
@@ -19,8 +20,10 @@ class RNNClassifier(nn.Module):
         logits = self.fc(last_hidden_state)
         return logits
 
-
 def train(model, num_epochs, train_loader, optimizer, criterion):
+    #start runtime for training model
+    start_time_train = time.time()
+
     losses = []
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
@@ -60,10 +63,21 @@ def train(model, num_epochs, train_loader, optimizer, criterion):
         print(f"Epoch {epoch + 1}/{num_epochs}:")
         print(f"  Train Loss: {average_loss:.4f} | Train Accuracy: {accuracy * 100:.2f}%")
         losses.append(average_loss)
+
+    #end runtime for training model
+    end_time_train = time.time()
+
+    #calculated runtime for training model
+    runtime_train = end_time_train - start_time_train
+    print(" Model Training Time:", runtime_train, "seconds")
+
     return losses
 
 
 def evaluate(model, test_loader, test_dataset, criterion):
+    #start runtime for evaluating model
+    start_time_eval = time.time()
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
 
@@ -94,3 +108,10 @@ def evaluate(model, test_loader, test_dataset, criterion):
 
     print(f"Eval Loss: {eval_loss:.4f} | Accuracy: {eval_accuracy:.4f} | "
           f"Precision: {eval_precision:.4f} | Recall: {eval_recall:.4f} | F1 Score: {eval_f1:.4f}")
+    
+    #end runtime for evaluating model
+    end_time_eval = time.time()
+
+    #calculated runtime for training model
+    runtime_eval = end_time_eval - start_time_eval
+    print("Model Evaluation Time:", runtime_eval, "seconds")
