@@ -21,11 +21,9 @@ def find_ratings_skew(datasets, class_type):
         frequency[i] = ratings.count(ratings_bins[i])
 
     # create distribution plot
-    df = pd.DataFrame(ratings_bins, columns=['Rating'])
-    df.insert(1, "Frequency", frequency)
-    df.sort_values('Rating')
-    print(df)
-    sns.displot(data=df, kde=True, x="Rating")
+    df = pd.DataFrame(ratings, columns=['Ratings'])
+    sns.displot(data=df, kde=True, x="Ratings")
+    plt.show()
 
 
 # Get the current working directory
