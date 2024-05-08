@@ -14,4 +14,7 @@ def generate_histogram(*directories):
     plt.ylabel('Frequency')
     plt.title('Movie Rating Frequency')
     plt.show()
-
+    print("Value\tCount")
+    for i in range(1, 11):
+        count = sorted_file_names.count(str(i))
+        print(f"{i}\t{count}")
