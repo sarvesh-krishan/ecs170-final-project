@@ -76,8 +76,5 @@ train_losses, val_losses = train(rnn_classifier, num_epochs, train_loader, val_l
 
 # Plot the training convergence
 model_losses = [train_losses]
-model_losses_2 = [val_losses]
 model_label = ['Model 1']
-model_label_2 = ['Model 2']
 plot_convergence(model_losses, model_label)
-plot_convergence(model_losses_2, model_label_2)
