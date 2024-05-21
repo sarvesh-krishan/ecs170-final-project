@@ -20,14 +20,27 @@ train_neg_examples = load_data(os.path.join(current_dir, 'data', 'train', 'neg')
 test_pos_examples = load_data(os.path.join(current_dir, 'data', 'test', 'pos'), 'positive')
 test_neg_examples = load_data(os.path.join(current_dir, 'data', 'test', 'neg'), 'negative')
 
-train_examples = train_pos_examples + train_neg_examples
+len_train_pos = int(len(train_pos_examples) * 0.8)
+len_train_neg = int(len(train_neg_examples) * 0.8)
+
+
+train_pos_subset = train_pos_examples[:len_train_pos]
+train_neg_subset = train_neg_examples[:len_train_neg]
+
+val_pos_subset = train_pos_examples[len_train_pos:]
+val_neg_subset = train_neg_examples[len_train_neg:]
+
+train_examples = train_pos_subset + train_neg_subset
+val_examples = val_pos_subset + val_neg_subset
 test_examples = test_pos_examples + test_neg_examples
 
 train_dataset = CustomDataset(train_examples, glove)
+val_dataset = CustomDataset(val_examples, glove)
 test_dataset = CustomDataset(test_examples, glove)
 
 # Use the collate_fn in your DataLoaders
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn)
+val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, collate_fn=collate_fn)
 test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, collate_fn=collate_fn)
 
 # EXPLORATORY DATA ANALYSIS
@@ -93,7 +106,7 @@ if 1:
     optimizer_rnn = torch.optim.Adam(rnn_classifier.parameters(), lr=0.001)
 
     # Train the RNN model
-    m1 = train(rnn_classifier, num_epochs, train_loader, optimizer_rnn, criterion)
+    m1 = train(rnn_classifier, num_epochs, train_loader, val_loader, optimizer_rnn, criterion)
 
     # Evaluate the RNN model
     evaluate(rnn_classifier, test_loader, test_dataset, criterion)

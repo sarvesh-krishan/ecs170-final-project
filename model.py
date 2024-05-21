@@ -20,11 +20,12 @@ class RNNClassifier(nn.Module):
         logits = self.fc(last_hidden_state)
         return logits
 
-def train(model, num_epochs, train_loader, optimizer, criterion):
+def train(model, num_epochs, train_loader, val_loader, optimizer, criterion):
     #start runtime for training model
     start_time_train = time.time()
 
-    losses = []
+    train_losses = []
+    val_losses = []
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
 
@@ -60,9 +61,28 @@ def train(model, num_epochs, train_loader, optimizer, criterion):
         average_loss = total_loss / len(train_loader)
         accuracy = total_correct / total_samples
 
+        # compute validation
+        model.eval()
+        val_loss = 0.0
+        val_correct = 0
+        val_samples = 0
+        with torch.no_grad():
+            for val_sequences, val_labels in val_loader:
+                val_sequences, val_labels = val_sequences.to(device), val_labels.to(device)
+                val_logits = model(val_sequences)
+                val_loss += criterion(val_logits, val_labels).item()
+                _, val_predictions = torch.max(val_logits, 1)
+                val_correct += torch.sum(val_predictions == val_labels).item()
+                val_samples += val_labels.size(0)
+
+        average_val_loss = val_loss / len(val_loader)
+        val_accuracy = val_correct / val_samples
+
         print(f"Epoch {epoch + 1}/{num_epochs}:")
         print(f"  Train Loss: {average_loss:.4f} | Train Accuracy: {accuracy * 100:.2f}%")
-        losses.append(average_loss)
+        train_losses.append(average_loss)
+        print(f"  Val Loss: {average_val_loss:.4f} | Val Accuracy: {val_accuracy * 100:.2f}%")
+        val_losses.append(average_val_loss)
 
     #end runtime for training model
     end_time_train = time.time()
@@ -71,7 +91,7 @@ def train(model, num_epochs, train_loader, optimizer, criterion):
     runtime_train = end_time_train - start_time_train
     print(" Model Training Time:", runtime_train, "seconds")
 
-    return losses
+    return train_losses, val_losses
 
 
 def evaluate(model, test_loader, test_dataset, criterion):
