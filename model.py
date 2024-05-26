@@ -20,6 +20,23 @@ class RNNClassifier(nn.Module):
         logits = self.fc(last_hidden_state)
         return logits
 
+class EarlyStopping:
+    def __init__(self, patience, delta):
+        self.patience = patience # num epochs to wait after last time val_loss improved
+        self.delta = delta # min change to qualify as an improvement
+        self.best_loss = float('inf')
+        self.counter = 0
+        self.early_stop = False # early stop flag
+
+    def __call__(self, val_loss):
+        if val_loss < self.best_loss - self.delta: # improvement
+            self.best_loss = val_loss
+            self.counter = 0
+        else: # no improvement
+            self.counter += 1
+            if self.counter >= self.patience:
+                self.early_stop = True
+
 def train(model, num_epochs, train_loader, val_loader, optimizer, criterion):
     #start runtime for training model
     start_time_train = time.time()
@@ -29,7 +46,14 @@ def train(model, num_epochs, train_loader, val_loader, optimizer, criterion):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
 
+    early_stopping = EarlyStopping(patience = 5, delta = 0.01)
+
     for epoch in range(num_epochs):
+        # Early stopping
+        if early_stopping.early_stop:
+            print(f"Early stopping at epoch {epoch + 1}")
+            break
+
         # Training
         model.train()
         total_loss = 0.0
@@ -83,6 +107,8 @@ def train(model, num_epochs, train_loader, val_loader, optimizer, criterion):
         train_losses.append(average_loss)
         print(f"  Val Loss: {average_val_loss:.4f} | Val Accuracy: {val_accuracy * 100:.2f}%")
         val_losses.append(average_val_loss)
+
+        early_stopping(average_val_loss)
 
     #end runtime for training model
     end_time_train = time.time()
