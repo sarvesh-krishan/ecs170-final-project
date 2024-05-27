@@ -6,11 +6,11 @@ from processing_data import glove
 
 
 class RNNClassifier(nn.Module):
-    def __init__(self, input_size, hidden_size, num_classes):
+    def __init__(self, input_size=100, hidden_size=128, num_layers=1, num_classes=2):
         super(RNNClassifier, self).__init__()
         self.hidden_size = hidden_size
         self.embedding = nn.Embedding.from_pretrained(glove.vectors)
-        self.rnn = nn.RNN(input_size, hidden_size, batch_first=True)
+        self.rnn = nn.RNN(input_size, hidden_size, num_layers, batch_first=True)
         self.fc = nn.Linear(hidden_size, num_classes)
 
     def forward(self, x):
