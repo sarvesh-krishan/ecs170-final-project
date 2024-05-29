@@ -10,7 +10,6 @@ from histogram import generate_histogram
 
 
 # LOADING DATA
-
 batch_size = 512
 
 # Get the current working directory
