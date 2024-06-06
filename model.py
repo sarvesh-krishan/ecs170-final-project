@@ -19,6 +19,21 @@ class RNNClassifier(nn.Module):
         last_hidden_state = output[:, -1, :]
         logits = self.fc(last_hidden_state)
         return logits
+    
+class BiRNNClassifier(nn.Module):
+    def __init__(self, input_size=100, hidden_size=128, num_layers=1, num_classes=2):
+        super(BiRNNClassifier, self).__init__()
+        self.hidden_size = hidden_size
+        self.embedding = nn.Embedding.from_pretrained(glove.vectors)
+        self.rnn = nn.RNN(input_size, hidden_size, num_layers, batch_first=True, bidirectional=True)
+        self.fc = nn.Linear(hidden_size * 2, num_classes)
+
+    def forward(self, x):
+        embedded = self.embedding(x)
+        output, _ = self.rnn(embedded)
+        last_hidden_state = output[:, -1, :]
+        logits = self.fc(last_hidden_state)
+        return logits
 
 class EarlyStopping:
     def __init__(self, patience, delta):
@@ -161,3 +176,4 @@ def evaluate(model, test_loader, test_dataset, criterion):
     #calculated runtime for training model
     runtime_eval = end_time_eval - start_time_eval
     print("Model Evaluation Time:", runtime_eval, "seconds")
+

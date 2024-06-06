@@ -3,7 +3,7 @@ from torch.utils.data import DataLoader
 import torch
 from torch import nn
 from processing_data import load_data, CustomDataset, glove, collate_fn
-from model import RNNClassifier, train, evaluate
+from model import RNNClassifier,BiRNNClassifier, train, evaluate
 from torchtext.data.utils import get_tokenizer
 from collections import Counter
 from histogram import generate_histogram
@@ -111,3 +111,24 @@ if 1:
     # Evaluate the RNN model
     evaluate(rnn_classifier, test_loader, test_dataset, criterion)
 
+if 1:
+    # Define the hyperparameters
+
+    input_size = 100  # Size of the input vectors (e.g., GloVe word embeddings)
+    hidden_size = 128  # Size of the hidden state in the RNN
+    num_layers = 1
+    num_classes = 2  # Number of output classes (positive and negative)
+    num_epochs = 10
+
+    # Create an instance of the classifier
+    bi_rnn_classifier = BiRNNClassifier(input_size, hidden_size, num_classes=num_classes)
+
+    # Define the loss function and optimizer
+    criterion = nn.CrossEntropyLoss()
+    optimizer_rnn = torch.optim.Adam(bi_rnn_classifier.parameters(), lr=0.001)
+
+    # Train the RNN model
+    m1 = train(bi_rnn_classifier, num_epochs, train_loader, val_loader, optimizer_rnn, criterion)
+
+    # Evaluate the RNN model
+    evaluate(bi_rnn_classifier, test_loader, test_dataset, criterion)
