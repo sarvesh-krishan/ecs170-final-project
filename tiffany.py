@@ -1,3 +1,5 @@
+import torchtext; torchtext.disable_torchtext_deprecation_warning()
+
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -10,7 +12,6 @@ import torch
 from torch import nn
 from processing_data import load_data, CustomDataset, glove, collate_fn
 from model import RNNClassifier, train, evaluate
-import torchtext; torchtext.disable_torchtext_deprecation_warning()
 from torchtext.data.utils import get_tokenizer
 from collections import Counter
 from histogram import generate_histogram
@@ -84,7 +85,7 @@ def getData():
 
     return test_dataset, train_loader, val_loader, test_loader
 
-def tuneLayers(test_dataset, train_loader, val_loader, test_loader, hidden_size=128, num_layers=1, ):
+def tuneLayers(test_dataset, train_loader, val_loader, test_loader, hidden_size=128, num_layers=1):
     # Define the hyperparameters
     input_size = 100  # Size of the input vectors (e.g., GloVe word embeddings)
     num_classes = 2  # Number of output classes (positive and negative)
@@ -104,9 +105,8 @@ def tuneLayers(test_dataset, train_loader, val_loader, test_loader, hidden_size=
     evaluate(rnn_classifier, test_loader, test_dataset, criterion)
 
 
-
 if 1:
-    hidden_size_arr = [128, 256, 512]
+    hidden_size_arr = [156, 256, 512]
     num_layers_arr = [1, 2, 3, 4]
 
     test_dataset, train_loader, val_loader, test_loader = getData()
@@ -114,3 +114,4 @@ if 1:
     for hidden_size in hidden_size_arr:
         for num_layers in num_layers_arr:
             tuneLayers(test_dataset, train_loader, val_loader, test_loader, hidden_size, num_layers)
+            print()

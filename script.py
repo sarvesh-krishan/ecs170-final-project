@@ -185,3 +185,34 @@ if 1:
     'Model 6': m6
 }
     plot_convergence(list(model_losses.values()), list(model_losses.keys()))
+
+# hyperparameter tuning - RNN hidden layer size & num of layers
+
+def tuneLayers(test_dataset, train_loader, val_loader, test_loader, hidden_size=128, num_layers=1):
+    # Define the hyperparameters
+    input_size = 100  # Size of the input vectors (e.g., GloVe word embeddings)
+    num_classes = 2  # Number of output classes (positive and negative)
+    num_epochs = 10 
+
+    # Create an instance of the classifier
+    rnn_classifier = RNNClassifier(input_size, hidden_size, num_classes)
+
+    # Define the loss function and optimizer
+    criterion = nn.CrossEntropyLoss()
+    optimizer_rnn = torch.optim.Adam(rnn_classifier.parameters(), lr=0.001)
+
+    # Train the RNN model
+    m1 = train(rnn_classifier, num_epochs, train_loader, val_loader, optimizer_rnn, criterion)
+
+    # Evaluate the RNN model
+    evaluate(rnn_classifier, test_loader, test_dataset, criterion)
+
+
+if 0:
+    hidden_size_arr = [156, 256, 512]
+    num_layers_arr = [1, 2, 3, 4]
+
+    for hidden_size in hidden_size_arr:
+        for num_layers in num_layers_arr:
+            tuneLayers(test_dataset, train_loader, val_loader, test_loader, hidden_size, num_layers)
+            print()
