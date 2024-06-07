@@ -9,6 +9,7 @@ from torchtext.data.utils import get_tokenizer
 from collections import Counter
 from histogram import generate_histogram
 from convergence import plot_convergence
+import matplotlib.pyplot as plt
 
 
 # LOADING DATA
@@ -119,6 +120,24 @@ print(df_negative['Words'].describe())
 print("\nStatistics for Characters in Negative Reviews:")
 print(df_negative['Characters'].describe())
 
+#Take rating from file name
+def generate_histogram(*directories):
+    ratings = []
+    for directory in directories:
+        files = os.listdir(directory)
+        file_names = [file.split('_', 1)[1].split('.')[0] for file in files if '_' in file and file.endswith('.txt')]
+        ratings.extend(file_names)
+    sorted_file_names = sorted(ratings, key=lambda x: int(x))
+#Print histogram 
+    plt.hist(sorted_file_names, bins=len(set(ratings)),color='blue', edgecolor='black')
+    plt.xlabel('Movie Rating')
+    plt.ylabel('Frequency')
+    plt.title('Movie Rating Frequency')
+    plt.show()
+    print("Value\tCount")
+    for i in range(1, 11):
+        count = sorted_file_names.count(str(i))
+        print(f"{i}\t{count}")
 # DEPLOYING THE MODELS
 
 if 1:
