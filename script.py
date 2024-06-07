@@ -2,6 +2,7 @@ import os
 from torch.utils.data import DataLoader
 import torch
 from torch import nn
+import pandas as pd
 from processing_data import load_data, CustomDataset, glove, collate_fn
 from model import RNNClassifier,BiRNNClassifier, train, evaluate
 from torchtext.data.utils import get_tokenizer
@@ -19,6 +20,9 @@ train_pos_examples = load_data(os.path.join(current_dir, 'data', 'train', 'pos')
 train_neg_examples = load_data(os.path.join(current_dir, 'data', 'train', 'neg'), 'negative')
 test_pos_examples = load_data(os.path.join(current_dir, 'data', 'test', 'pos'), 'positive')
 test_neg_examples = load_data(os.path.join(current_dir, 'data', 'test', 'neg'), 'negative')
+
+positive_reviews = train_pos_examples + test_pos_examples
+negative_reviews = train_neg_examples + test_neg_examples
 
 len_train_pos = int(len(train_pos_examples) * 0.8)
 len_train_neg = int(len(train_neg_examples) * 0.8)
@@ -87,6 +91,33 @@ if 1:
     directory_path2 = os.path.join('data', 'test', 'pos')
     generate_histogram(directory_path1, directory_path2)
 
+#five number summary 
+
+# Create the pandas DataFrame for positive reviews
+df_positive = pd.DataFrame(positive_reviews, columns=['Review', 'Label'])
+df_positive['Words'] = df_positive['Review'].apply(lambda x: len(x.split()))
+df_positive['Characters'] = df_positive['Review'].apply(len)
+
+# Create the pandas DataFrame for negative reviews
+df_negative = pd.DataFrame(negative_reviews, columns=['Review', 'Label'])
+df_negative['Words'] = df_negative['Review'].apply(lambda x: len(x.split()))
+df_negative['Characters'] = df_negative['Review'].apply(len)
+
+# Print dataframes and their statistical descriptions for positive reviews
+print("\nPositive Reviews DataFrame:")
+print(df_positive)
+print("\nStatistics for Words in Positive Reviews:")
+print(df_positive['Words'].describe())
+print("\nStatistics for Characters in Positive Reviews:")
+print(df_positive['Characters'].describe())
+
+# Print dataframes and their statistical descriptions for negative reviews
+print("\nNegative Reviews DataFrame:")
+print(df_negative)
+print("\nStatistics for Words in Negative Reviews:")
+print(df_negative['Words'].describe())
+print("\nStatistics for Characters in Negative Reviews:")
+print(df_negative['Characters'].describe())
 
 # DEPLOYING THE MODELS
 
