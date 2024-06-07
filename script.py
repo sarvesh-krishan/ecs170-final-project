@@ -2,11 +2,13 @@ import os
 from torch.utils.data import DataLoader
 import torch
 from torch import nn
+import pandas as pd
 from processing_data import load_data, CustomDataset, glove, collate_fn
-from model import RNNClassifier, train, evaluate
+from model import RNNClassifier,BiRNNClassifier, train, evaluate
 from torchtext.data.utils import get_tokenizer
 from collections import Counter
 from histogram import generate_histogram
+from convergence import plot_convergence
 
 
 # LOADING DATA
@@ -18,6 +20,9 @@ train_pos_examples = load_data(os.path.join(current_dir, 'data', 'train', 'pos')
 train_neg_examples = load_data(os.path.join(current_dir, 'data', 'train', 'neg'), 'negative')
 test_pos_examples = load_data(os.path.join(current_dir, 'data', 'test', 'pos'), 'positive')
 test_neg_examples = load_data(os.path.join(current_dir, 'data', 'test', 'neg'), 'negative')
+
+positive_reviews = train_pos_examples + test_pos_examples
+negative_reviews = train_neg_examples + test_neg_examples
 
 len_train_pos = int(len(train_pos_examples) * 0.8)
 len_train_neg = int(len(train_neg_examples) * 0.8)
@@ -86,6 +91,33 @@ if 1:
     directory_path2 = os.path.join('data', 'test', 'pos')
     generate_histogram(directory_path1, directory_path2)
 
+#five number summary 
+
+# Create the pandas DataFrame for positive reviews
+df_positive = pd.DataFrame(positive_reviews, columns=['Review', 'Label'])
+df_positive['Words'] = df_positive['Review'].apply(lambda x: len(x.split()))
+df_positive['Characters'] = df_positive['Review'].apply(len)
+
+# Create the pandas DataFrame for negative reviews
+df_negative = pd.DataFrame(negative_reviews, columns=['Review', 'Label'])
+df_negative['Words'] = df_negative['Review'].apply(lambda x: len(x.split()))
+df_negative['Characters'] = df_negative['Review'].apply(len)
+
+# Print dataframes and their statistical descriptions for positive reviews
+print("\nPositive Reviews DataFrame:")
+print(df_positive)
+print("\nStatistics for Words in Positive Reviews:")
+print(df_positive['Words'].describe())
+print("\nStatistics for Characters in Positive Reviews:")
+print(df_positive['Characters'].describe())
+
+# Print dataframes and their statistical descriptions for negative reviews
+print("\nNegative Reviews DataFrame:")
+print(df_negative)
+print("\nStatistics for Words in Negative Reviews:")
+print(df_negative['Words'].describe())
+print("\nStatistics for Characters in Negative Reviews:")
+print(df_negative['Characters'].describe())
 
 # DEPLOYING THE MODELS
 
@@ -110,3 +142,46 @@ if 1:
     # Evaluate the RNN model
     evaluate(rnn_classifier, test_loader, test_dataset, criterion)
 
+if 1:
+    # Define the hyperparameters
+
+    input_size = 100  # Size of the input vectors (e.g., GloVe word embeddings)
+    hidden_size = 128  # Size of the hidden state in the RNN
+    num_layers = 1
+    num_classes = 2  # Number of output classes (positive and negative)
+    num_epochs = 10
+
+    # Create an instance of the classifier
+    bi_rnn_classifier = BiRNNClassifier(input_size, hidden_size, num_classes=num_classes)
+
+   
+       # Define the loss function and optimizer
+    criterion = nn.CrossEntropyLoss()
+    optimizer_rnnA1 = torch.optim.Adam(rnn_classifier.parameters(), lr=0.01)
+    optimizer_rnnA2 = torch.optim.Adam(rnn_classifier.parameters(), lr=0.001)
+    optimizer_rnnA3 = torch.optim.Adam(rnn_classifier.parameters(), lr=0.0001)
+    optimizer_rnnS1 = torch.optim.SGD(rnn_classifier.parameters(), lr=0.01)
+    optimizer_rnnS2 = torch.optim.SGD(rnn_classifier.parameters(), lr=0.001)
+    optimizer_rnnS3 = torch.optim.SGD(rnn_classifier.parameters(), lr=0.0001)
+
+    # Train the RNN model
+    m1 = train(rnn_classifier, num_epochs, train_loader, val_loader, optimizer_rnnA1, criterion)
+    m2 = train(rnn_classifier, num_epochs, train_loader, val_loader, optimizer_rnnA2, criterion)
+    m3 = train(rnn_classifier, num_epochs, train_loader, val_loader, optimizer_rnnA3, criterion)
+    m4 = train(rnn_classifier, num_epochs, train_loader, val_loader, optimizer_rnnS1, criterion)
+    m5 = train(rnn_classifier, num_epochs, train_loader, val_loader, optimizer_rnnS2, criterion)
+    m6 = train(rnn_classifier, num_epochs, train_loader, val_loader, optimizer_rnnS3, criterion)
+
+    # Evaluate the RNN model
+    evaluate(rnn_classifier, test_loader, test_dataset, criterion)
+
+    # Plot Convergence
+    model_losses = {
+    'Model 1': m1,
+    'Model 2': m2,
+    'Model 3': m3,
+    'Model 4': m4,
+    'Model 5': m5,
+    'Model 6': m6
+}
+    plot_convergence(list(model_losses.values()), list(model_losses.keys()))
