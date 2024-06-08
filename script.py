@@ -3,12 +3,12 @@ from torch.utils.data import DataLoader
 import torch
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 import seaborn as sns
 from torch import nn
 from processing_data import load_data, CustomDataset, glove, collate_fn, generate_histogram
-from model import RNNClassifier, train, evaluate
+from model import RNNClassifier, LSTMClassifier, GRUClassifier, train, evaluate
 from torchtext.data.utils import get_tokenizer
-import matplotlib.pyplot as plt
 from collections import Counter
 
 
