@@ -1,16 +1,16 @@
 import torch
 import time
 from torch import nn
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_curve, auc
 from processing_data import glove
 
 
 class RNNClassifier(nn.Module):
-    def __init__(self, input_size=100, hidden_size=128, num_layers=1, num_classes=2):
+    def __init__(self, input_size, hidden_size, num_classes):
         super(RNNClassifier, self).__init__()
         self.hidden_size = hidden_size
         self.embedding = nn.Embedding.from_pretrained(glove.vectors)
-        self.rnn = nn.RNN(input_size, hidden_size, num_layers, batch_first=True)
+        self.rnn = nn.RNN(input_size, hidden_size, batch_first=True)
         self.fc = nn.Linear(hidden_size, num_classes)
 
     def forward(self, x):
@@ -20,6 +20,7 @@ class RNNClassifier(nn.Module):
         logits = self.fc(last_hidden_state)
         return logits
     
+
 class BiRNNClassifier(nn.Module):
     def __init__(self, input_size=100, hidden_size=128, num_layers=1, num_classes=2):
         super(BiRNNClassifier, self).__init__()
@@ -34,6 +35,39 @@ class BiRNNClassifier(nn.Module):
         last_hidden_state = output[:, -1, :]
         logits = self.fc(last_hidden_state)
         return logits
+
+
+class LSTMClassifier(nn.Module):
+    def __init__(self, input_size, hidden_size, num_classes):
+        super(LSTMClassifier, self).__init__()
+        self.hidden_size = hidden_size
+        self.embedding = nn.Embedding.from_pretrained(glove.vectors)
+        self.lstm = nn.LSTM(input_size, hidden_size, batch_first=True, bidirectional=True)
+        self.fc = nn.Linear(hidden_size * 2, num_classes)  # Multiply hidden_size by 2 for bidirectional LSTM
+
+    def forward(self, x):
+        embedded = self.embedding(x)
+        output, _ = self.lstm(embedded)
+        last_hidden_state = torch.cat((output[:, -1, :self.hidden_size], output[:, 0, self.hidden_size:]), dim=1)
+        logits = self.fc(last_hidden_state)
+        return logits
+
+
+class GRUClassifier(nn.Module):
+    def __init__(self, input_size, hidden_size, num_classes):
+        super(GRUClassifier, self).__init__()
+        self.hidden_size = hidden_size
+        self.embedding = nn.Embedding.from_pretrained(glove.vectors)
+        self.gru = nn.GRU(input_size, hidden_size, batch_first=True)
+        self.fc = nn.Linear(hidden_size, num_classes)
+
+    def forward(self, x):
+        embedded = self.embedding(x)
+        output, _ = self.gru(embedded)
+        last_hidden_state = output[:, -1, :]
+        logits = self.fc(last_hidden_state)
+        return logits
+
 
 class EarlyStopping:
     def __init__(self, patience, delta):
@@ -51,6 +85,7 @@ class EarlyStopping:
             self.counter += 1
             if self.counter >= self.patience:
                 self.early_stop = True
+
 
 def train(model, num_epochs, train_loader, val_loader, optimizer, criterion):
     #start runtime for training model
@@ -176,4 +211,12 @@ def evaluate(model, test_loader, test_dataset, criterion):
     #calculated runtime for training model
     runtime_eval = end_time_eval - start_time_eval
     print("Model Evaluation Time:", runtime_eval, "seconds")
-
+    # Confusion Matrix
+    cm = confusion_matrix(eval_labels, eval_predictions)
+    print("Confusion Matrix:")
+    print(cm)
+    # Calculate ROC curve
+    fpr, tpr, thresholds = roc_curve(eval_labels, eval_predictions) 
+    roc_auc = auc(fpr, tpr)
+    print(roc_auc)
+    
