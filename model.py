@@ -218,5 +218,7 @@ def evaluate(model, test_loader, test_dataset, criterion):
     # Calculate ROC curve
     fpr, tpr, thresholds = roc_curve(eval_labels, eval_predictions) 
     roc_auc = auc(fpr, tpr)
+    print("Area Under the ROC Curve:")
     print(roc_auc)
+    return [fpr, tpr, roc_auc]
     
