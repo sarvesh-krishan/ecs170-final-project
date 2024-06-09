@@ -174,6 +174,16 @@ if 1:
     rnn_3_train_losses, rnn_3_val_losses = train(rnn_3, num_epochs, train_loader, val_loader, optimizer_rnn_3, criterion)
     rnn_4_train_losses, rnn_4_val_losses = train(rnn_4, num_epochs, train_loader, val_loader, optimizer_rnn_4, criterion)
 
+    # Pad the list of losses with 0s for early stopping
+    rnn_1_train_losses = np.pad(rnn_1_train_losses, (0, num_epochs-len(rnn_1_train_losses)), mode='constant')
+    rnn_2_train_losses = np.pad(rnn_2_train_losses, (0, num_epochs-len(rnn_2_train_losses)), mode='constant')
+    rnn_3_train_losses = np.pad(rnn_3_train_losses, (0, num_epochs-len(rnn_3_train_losses)), mode='constant')
+    rnn_4_train_losses = np.pad(rnn_4_train_losses, (0, num_epochs-len(rnn_4_train_losses)), mode='constant')
+    rnn_1_val_losses = np.pad(rnn_1_val_losses, (0, num_epochs-len(rnn_1_val_losses)), mode='constant')
+    rnn_2_val_losses = np.pad(rnn_2_val_losses, (0, num_epochs-len(rnn_2_val_losses)), mode='constant')
+    rnn_3_val_losses = np.pad(rnn_3_val_losses, (0, num_epochs-len(rnn_3_val_losses)), mode='constant')
+    rnn_4_val_losses = np.pad(rnn_4_val_losses, (0, num_epochs-len(rnn_4_val_losses)), mode='constant')
+
     # Evaluate the models
     rnn_1_roc_data = evaluate(rnn_1, test_loader, test_dataset, criterion)
     rnn_2_roc_data = evaluate(rnn_2, test_loader, test_dataset, criterion)
@@ -235,6 +245,16 @@ if 0:
     rnn_2_train_losses, rnn_2_val_losses = train(rnn_2, num_epochs, train_loader, val_loader, optimizer_rnn_2, criterion)
     rnn_3_train_losses, rnn_3_val_losses = train(rnn_3, num_epochs, train_loader, val_loader, optimizer_rnn_3, criterion)
     rnn_4_train_losses, rnn_4_val_losses = train(rnn_4, num_epochs, train_loader, val_loader, optimizer_rnn_4, criterion)
+
+    # Pad the list of losses with 0s for early stopping
+    rnn_1_train_losses = np.pad(rnn_1_train_losses, (0, num_epochs-len(rnn_1_train_losses)), mode='constant')
+    rnn_2_train_losses = np.pad(rnn_2_train_losses, (0, num_epochs-len(rnn_2_train_losses)), mode='constant')
+    rnn_3_train_losses = np.pad(rnn_3_train_losses, (0, num_epochs-len(rnn_3_train_losses)), mode='constant')
+    rnn_4_train_losses = np.pad(rnn_4_train_losses, (0, num_epochs-len(rnn_4_train_losses)), mode='constant')
+    rnn_1_val_losses = np.pad(rnn_1_val_losses, (0, num_epochs-len(rnn_1_val_losses)), mode='constant')
+    rnn_2_val_losses = np.pad(rnn_2_val_losses, (0, num_epochs-len(rnn_2_val_losses)), mode='constant')
+    rnn_3_val_losses = np.pad(rnn_3_val_losses, (0, num_epochs-len(rnn_3_val_losses)), mode='constant')
+    rnn_4_val_losses = np.pad(rnn_4_val_losses, (0, num_epochs-len(rnn_4_val_losses)), mode='constant')
 
     # Evaluate the models
     rnn_1_roc_data = evaluate(rnn_1, test_loader, test_dataset, criterion)
