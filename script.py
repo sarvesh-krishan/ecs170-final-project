@@ -786,3 +786,122 @@ if 0:
     plt.title('ROC Curve')
     plt.legend()
     plt.show() 
+
+if 0:
+    print("Model 21,33,35 Deployment ")
+    # Define the hyperparameters
+    input_size = 100  # Size of the input vectors (e.g., GloVe word embeddings)
+    num_classes = 2  # Number of output classes (positive and negative)
+    num_epochs = 15
+
+    # Create an instance of the classifier
+    rnn_1 = LSTMClassifier(input_size, 128, num_classes)
+    rnn_2 = GRUClassifier(input_size, 128, num_classes)
+    rnn_3 = GRUClassifier(input_size, 256, num_classes)
+
+
+    # Define the loss function and optimizer
+    criterion = nn.CrossEntropyLoss()
+    optimizer_rnn_1 = torch.optim.Adam(rnn_1.parameters(), lr=0.01)
+    optimizer_rnn_2 = torch.optim.Adam(rnn_2.parameters(), lr=0.01)
+    optimizer_rnn_3 = torch.optim.Adam(rnn_3.parameters(), lr=0.01)
+
+    # Train the models
+    rnn_1_train_losses, rnn_1_val_losses = train(rnn_1, num_epochs, train_loader, val_loader, optimizer_rnn_1, criterion)
+    rnn_2_train_losses, rnn_2_val_losses = train(rnn_2, num_epochs, train_loader, val_loader, optimizer_rnn_2, criterion)
+    rnn_3_train_losses, rnn_3_val_losses = train(rnn_3, num_epochs, train_loader, val_loader, optimizer_rnn_3, criterion)
+   
+
+    # Pad the list of losses with 0s for early stopping
+    rnn_1_train_losses = np.pad(rnn_1_train_losses, (0, num_epochs-len(rnn_1_train_losses)), mode='constant', constant_values=np.nan)
+    rnn_2_train_losses = np.pad(rnn_2_train_losses, (0, num_epochs-len(rnn_2_train_losses)), mode='constant', constant_values=np.nan)
+    rnn_3_train_losses = np.pad(rnn_3_train_losses, (0, num_epochs-len(rnn_3_train_losses)), mode='constant', constant_values=np.nan)
+   
+    rnn_1_val_losses = np.pad(rnn_1_val_losses, (0, num_epochs-len(rnn_1_val_losses)), mode='constant', constant_values=np.nan)
+    rnn_2_val_losses = np.pad(rnn_2_val_losses, (0, num_epochs-len(rnn_2_val_losses)), mode='constant', constant_values=np.nan)
+    rnn_3_val_losses = np.pad(rnn_3_val_losses, (0, num_epochs-len(rnn_3_val_losses)), mode='constant', constant_values=np.nan)
+
+    # Evaluate the models
+    rnn_1_roc_data = evaluate(rnn_1, test_loader, test_dataset, criterion)
+    rnn_2_roc_data = evaluate(rnn_2, test_loader, test_dataset, criterion)
+    rnn_3_roc_data = evaluate(rnn_3, test_loader, test_dataset, criterion)
+    
+
+    # Plot the training convergence
+    df = pd.DataFrame({'Num Epochs':np.arange(1,num_epochs+1),
+                       'Model 21 Train Loss':rnn_1_train_losses, 'Model 21 Val Loss':rnn_1_val_losses,
+                       'Model 33 Train Loss':rnn_2_train_losses, 'Model 33 Val Loss':rnn_2_val_losses,
+                       'Model 35 Train Loss':rnn_3_train_losses, 'Model 35 Val Loss':rnn_3_val_losses,
+                      })
+    for col in df.columns[1:]:
+        sns.lineplot(x='Num Epochs', y=col, data=df, label=col)
+    plt.xlabel('Training Epoch')
+    plt.ylabel('Loss')
+    plt.title('Training Convergence Plot')
+    plt.legend()
+    plt.show()
+
+    # Plot the ROC curve
+    plt.figure()  
+    plt.plot(rnn_1_roc_data[0], rnn_1_roc_data[1], label='Model 21 (area = %0.2f)' % rnn_1_roc_data[2])
+    plt.plot(rnn_2_roc_data[0], rnn_2_roc_data[1], label='Model 33 (area = %0.2f)' % rnn_2_roc_data[2])
+    plt.plot(rnn_3_roc_data[0], rnn_3_roc_data[1], label='Model 35 (area = %0.2f)' % rnn_3_roc_data[2])
+    plt.plot([0, 1], [0, 1], 'k--', label='Random Chance')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('ROC Curve')
+    plt.legend()
+    plt.show()
+if 1:
+    print("Base Model Deployment")
+    # Define the hyperparameters
+    input_size = 100  # Size of the input vectors (e.g., GloVe word embeddings)
+    num_classes = 2  # Number of output classes (positive and negative)
+    num_epochs = 15
+
+    # Create an instance of the classifier
+    rnn_1 = RNNClassifier(input_size, 128, num_classes)
+
+
+    # Define the loss function and optimizer
+    criterion = nn.CrossEntropyLoss()
+    optimizer_rnn_1 = torch.optim.Adam(rnn_1.parameters(), lr=0.001)
+
+
+    # Train the models
+    rnn_1_train_losses, rnn_1_val_losses = train(rnn_1, num_epochs, train_loader, val_loader, optimizer_rnn_1, criterion)
+   
+
+    # Pad the list of losses with 0s for early stopping
+    rnn_1_train_losses = np.pad(rnn_1_train_losses, (0, num_epochs-len(rnn_1_train_losses)), mode='constant', constant_values=np.nan)
+    rnn_1_val_losses = np.pad(rnn_1_val_losses, (0, num_epochs-len(rnn_1_val_losses)), mode='constant', constant_values=np.nan)
+  
+
+    # Evaluate the models
+    rnn_1_roc_data = evaluate(rnn_1, test_loader, test_dataset, criterion)
+   
+
+    # Plot the training convergence
+    df = pd.DataFrame({'Num Epochs':np.arange(1,num_epochs+1),
+                       'Base Model Train Loss':rnn_1_train_losses, 'Model 1 Val Loss':rnn_1_val_losses,
+                     })
+    for col in df.columns[1:]:
+        sns.lineplot(x='Num Epochs', y=col, data=df, label=col)
+    plt.xlabel('Training Epoch')
+    plt.ylabel('Loss')
+    plt.title('Training Convergence Plot')
+    plt.legend()
+    plt.show() 
+ # Plot the ROC curve
+    plt.figure()  
+    plt.plot(rnn_1_roc_data[0], rnn_1_roc_data[1], label='Model 21 (area = %0.2f)' % rnn_1_roc_data[2])
+    plt.plot([0, 1], [0, 1], 'k--', label='Random Chance')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('ROC Curve')
+    plt.legend()
+    plt.show()
