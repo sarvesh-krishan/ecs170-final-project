@@ -854,8 +854,8 @@ if 0:
     plt.title('ROC Curve')
     plt.legend()
     plt.show()
-if 1:
-    print("Base Model Deployment")
+if 0:
+    print("Initial Model Deployment")
     # Define the hyperparameters
     input_size = 100  # Size of the input vectors (e.g., GloVe word embeddings)
     num_classes = 2  # Number of output classes (positive and negative)
@@ -885,7 +885,7 @@ if 1:
 
     # Plot the training convergence
     df = pd.DataFrame({'Num Epochs':np.arange(1,num_epochs+1),
-                       'Base Model Train Loss':rnn_1_train_losses, 'Model 1 Val Loss':rnn_1_val_losses,
+                       'Initial RNN Model Train Loss':rnn_1_train_losses, 'Initial Model':rnn_1_val_losses,
                      })
     for col in df.columns[1:]:
         sns.lineplot(x='Num Epochs', y=col, data=df, label=col)
@@ -896,7 +896,7 @@ if 1:
     plt.show() 
  # Plot the ROC curve
     plt.figure()  
-    plt.plot(rnn_1_roc_data[0], rnn_1_roc_data[1], label='Model 21 (area = %0.2f)' % rnn_1_roc_data[2])
+    plt.plot(rnn_1_roc_data[0], rnn_1_roc_data[1], label='Initial RNN Model (area = %0.2f)' % rnn_1_roc_data[2])
     plt.plot([0, 1], [0, 1], 'k--', label='Random Chance')
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
