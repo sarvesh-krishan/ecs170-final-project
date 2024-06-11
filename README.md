@@ -20,3 +20,5 @@ Please ensure the following libraries are installed on your local machine:
 7. `time`: Imported to compute run-time of training and evaluating models
 8. `torchtext`: Imported to embed words as vectors to feed into the RNN
 9. `sklearn`: Imported to utilize performance metrics functions, such as accuracy, precision, etc.
+
+You will also need GloVe pre-trained word vectors that can be downloaded from [The Stanford Natural Language Processing Group](https://nlp.stanford.edu/projects/glove/) and placed into `./ecs170-final-project/data/.vector_cache`. The file is `glove.6B.100d.txt`.
