@@ -21,22 +21,6 @@ class RNNClassifier(nn.Module):
         return logits
     
 
-class BiRNNClassifier(nn.Module):
-    def __init__(self, input_size=100, hidden_size=128, num_layers=1, num_classes=2):
-        super(BiRNNClassifier, self).__init__()
-        self.hidden_size = hidden_size
-        self.embedding = nn.Embedding.from_pretrained(glove.vectors)
-        self.rnn = nn.RNN(input_size, hidden_size, num_layers, batch_first=True, bidirectional=True)
-        self.fc = nn.Linear(hidden_size * 2, num_classes)
-
-    def forward(self, x):
-        embedded = self.embedding(x)
-        output, _ = self.rnn(embedded)
-        last_hidden_state = output[:, -1, :]
-        logits = self.fc(last_hidden_state)
-        return logits
-
-
 class LSTMClassifier(nn.Module):
     def __init__(self, input_size, hidden_size, num_classes):
         super(LSTMClassifier, self).__init__()
